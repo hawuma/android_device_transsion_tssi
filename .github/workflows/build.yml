@@ -49,7 +49,7 @@ jobs:
           cd twrp
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
-          lunch twrp_tssi-eng
+          lunch omni_tssi-eng
           mka vendorbootimage -j$(nproc)
 
       - name: Upload Result
