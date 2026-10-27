@@ -44,6 +44,11 @@ jobs:
           mkdir -p device/transsion
           git clone https://github.com/hawuma/android_device_transsion_tssi.git device/transsion/tssi
 
+      - name: Clone Vendor Omni
+        run: |
+          cd twrp
+          git clone https://github.com/omnirom/android_vendor_omni.git vendor/omni -b android-12.1
+
       - name: Start Building
         run: |
           cd twrp
