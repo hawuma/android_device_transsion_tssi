@@ -2,6 +2,8 @@ name: Build TWRP
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
@@ -42,7 +44,7 @@ jobs:
           mkdir -p device/transsion
           git clone https://github.com/hawuma/android_device_transsion_tssi.git device/transsion/tssi
 
-              - name: Start Building
+      - name: Start Building
         run: |
           cd twrp
           source build/envsetup.sh
