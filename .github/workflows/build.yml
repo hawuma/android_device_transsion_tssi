@@ -1,0 +1,57 @@
+name: Build TWRP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Free Up Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+
+      - name: Set up repo
+        run: |
+          mkdir ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Initialize Repo
+        run: |
+          git config --global user.name "Builder"
+          git config --global user.email "builder@action.com"
+          mkdir twrp && cd twrp
+          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1
+
+      - name: Sync Repo
+        run: |
+          cd twrp
+          repo sync -j$(nproc) --no-tags --no-clone-bundle
+
+      - name: Insert Device Tree
+        run: |
+          cd twrp
+          mkdir -p device/transsion
+          git clone https://github.com/hawuma/android_device_transsion_tssi.git device/transsion/tssi
+
+              - name: Start Building
+        run: |
+          cd twrp
+          source build/envsetup.sh
+          export ALLOW_MISSING_DEPENDENCIES=true
+          lunch twrp_tssi-eng
+          mka vendorbootimage -j$(nproc)
+
+      - name: Upload Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor_boot_twrp
+          path: twrp/out/target/product/tssi/vendor_boot.img
